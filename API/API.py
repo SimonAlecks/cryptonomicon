@@ -3,6 +3,9 @@ from datetime import datetime
 import requests
 from urllib.parse import urlencode
 from coinbase.wallet.client import Client
+import csv
+from urllib.request import urlopen
+
 
 class PoloniexAPI():
     base_url = 'https://poloniex.com/public?'
@@ -56,6 +59,11 @@ class PoloniexAPI():
         # External validation info
         valid_times = [300, 900, 1800, 7200, 14400, 86400]
 
+        if periods not in list(map(lambda x: x / (pow(60, 2)), valid_times)):
+            raise ValueError("Period not accepted by PoloniexAPI")
+        else:
+            period = periods * pow(60, 2)
+
         # Check if pairs exist
         if currency_pair not in self.returnticker():
             raise ValueError("This is not a pairing that eixsts!!")
@@ -63,11 +71,6 @@ class PoloniexAPI():
         # Arg Parsing
         start = self.time_to_unix(start)
         end = self.time_to_unix(end)
-
-        if periods not in list(map(lambda x: x / (pow(60, 2)), valid_times)):
-            raise ValueError("Period not accepted by PoloniexAPI")
-        else:
-            period = periods * pow(60, 2)
 
         query = {'command': 'returnChartData', 'currencyPair': currency_pair, 'start':start, 'end':end, 'period':period}
         # Generate query
@@ -82,6 +85,9 @@ class PoloniexAPI():
         url = self.base_url + urlencode(query)
         api_json = self.query(url).json()
         return api_json
+
+    def marketTradeHist(self):
+        pass
 
     def query(self, url):
         return requests.get(url)
@@ -109,8 +115,61 @@ class CoinbaseAPI:
         return accounts.balance
 
 
+class EtherScanAPI():
+
+    token = '7DHZUMKWFKEF3QUAJDVS4WEDJ9Y4KBGQP7'
+
+    # Constants
+    base_url = 'https://api.etherscan.io/api?'
+
+    def __init__(self):
+        pass
+
+    def returntokendata(self):
+        query={'action': 'token_supply', 'module': 'stats'}
+        query.update({'token_name': 'zrx'})
+
+        url = self.base_url + urlencode(query)
+
+        api_json = self.query(url).json()
+
+    def query(self, url):
+        return requests.get(url)
 
 
+class EtherScanCSV:
+
+    base_url = 'https://etherscan.io/chart/'
+    suffix = '?output=csv'
+
+    series = [
+        'tx',
+        'address',
+        'etherpice',
+        'marketcap',
+        'ethersupplygrowth',
+        'pendingtx',
+        'ens_register'
+    ]
+
+    def __init__(self):
+        pass
+
+    def download_series(self, series=None):
+        if series not in self.series:
+            raise ValueError("Series doesn't exist")
+
+        s = requests.Session()
+        url = self.base_url + series + self.suffix
+        download = s.get(url)
+        decoded_content = download.content.decode('utf-8')
+        cr = csv.reader(decoded_content.splitlines(), delimiter=',')
+        my_list = list(cr)
+        df = pd.DataFrame(data=my_list)
+        df.columns = df.iloc[0, :]
+        df = df.iloc[1:, :]
+        df = df.set_index('Date(UTC)')
+        return df
 
 
 
