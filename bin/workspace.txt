@@ -1,0 +1,3 @@
+echo $WORKON_HOME
+source ./simon/.local/bin/virtualenvwrapper.sh
+workon cryptonomicon

@@ -1,4 +1,3 @@
-from .API import *
-from .EtherscanScript import *
-from .EtherscanScraper import *
-from .EtherTransacrionts import *
+from .currency_engine import *
+from .scrape_holders import *
+from .scrape_transactions import *
