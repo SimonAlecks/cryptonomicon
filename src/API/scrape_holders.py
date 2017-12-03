@@ -1,11 +1,10 @@
-import re
-import os
-import pandas as pd
-from time import gmtime, strftime, sleep
-import API
-from API.scrape_functions import *
+from time import sleep
+from src.API import EtherScanEngine
+from src.API.scrape_functions import *
+from time import sleep
 
-class EtherHolders(API.EtherScanEngine):
+
+class EtherHolders(EtherScanEngine):
 
     # This scraping expects the following schema
     expected_schema = ('Rank', 'Address', 'Quantity', 'Percentage')
@@ -43,7 +42,7 @@ class EtherHolders(API.EtherScanEngine):
 
             scraped_data = self._scrape_data(data_rows, scraped_data)
             p = p + 1
-            print(p)
+            print("scraping page {0} from url:{1} with params{2}".format(p, self.holders_url, params))
 
     def _scrape_data(self, rows, scraped_data):
         """ For each page, assert the schema holds, then get the grows"""
@@ -60,7 +59,6 @@ class EtherHolders(API.EtherScanEngine):
         """Every page has 50 rows, except the last page, which has between 1 and 50 rows"""
         if self._end_reached(data_rows):
             return True
-
         if p == 5:
             return True
 

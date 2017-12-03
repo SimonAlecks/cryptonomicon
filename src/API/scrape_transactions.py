@@ -2,12 +2,13 @@ import os
 from bs4 import BeautifulSoup
 import pandas as pd
 from time import gmtime, strftime, sleep
-import API
-from API.scrape_functions import *
+import src.API
+from src.API.scrape_functions import *
+from src.API.currency_engine import *
 from collections import defaultdict
 
 
-class EtherTransactions(API.EtherScanEngine):
+class EtherTransactions(EtherScanEngine):
 
     def __init__(self, currency, **kwargs):
         super(self.__class__, self).__init__(currency, **kwargs)

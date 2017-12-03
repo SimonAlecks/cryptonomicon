@@ -1,4 +1,4 @@
-from API.scrape_functions import *
+from src.API.scrape_functions import *
 import re
 import requests
 from bs4 import BeautifulSoup

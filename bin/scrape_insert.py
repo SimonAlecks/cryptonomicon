@@ -1,9 +1,12 @@
-from API import *
+import sys
+sys.path.insert(0, '/home/simon/PycharmProjects/cryptonomicon')
 import sqlite3
 import time
 import argparse
+import pdb
+from src.API import *
 
-database = '/home/simon/PycharmProjects/cryptonomicon/database/database.sqlite3'
+database = '/home/simon/PycharmProjects/cryptonomicon/src/database/database.sqlite3'
 
 def data_entry(scraped_data):
 
@@ -36,6 +39,7 @@ def main():
 
     currency = args.currency.split(',')
 
+    # Scrape data
     obj = EtherHolders(currency=currency)
     data = obj.run(sleep=1)
 
